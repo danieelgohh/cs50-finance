@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Portfolio
+{% endblock %}
+
+{% block main %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="text-start">Symbol</th>
+                <th class="text-start">Name</th>
+                <th class="text-end">Shares</th>
+                <th class="text-end">Price</th>
+                <th class="text-end">TOTAL</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for symb in symbol %}
+            <tr>
+                {% set x = lookup(symb['symbol']) %}
+                {% set tshares = db.execute("SELECT SUM(shares) FROM purchases WHERE symbol = ?", symb['symbol']) %}
+                {% set total_price = ((float(tshares[0]['SUM(shares)']) * x["price"])|float) | usd %}
+                <td class="text-start" href="/buy">{{ x["symbol"] }}</td>
+                <td class="text-start">{{ x["name"] }}</td>
+                <td class="text-end">{{ tshares[0]['SUM(shares)'] }}</td>
+                <td class="text-end">{{ x["price"] | usd }}</td>
+                <td class="text-end">{{ total_price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td class="border-0 fw-bold text-end" colspan="4">Cash</td>
+                <td class="border-0 text-end">{{ cash | usd }}</td>
+            </tr>
+            <tr>
+                <td class="border-0 fw-bold text-end" colspan="4">TOTAL</td>
+                <td class="border-0 w-bold text-end">{{ ((currprice + cash)|float) | usd }}</td>
+            </tr>
+        </tfoot>
+    </table>
+{% endblock %}

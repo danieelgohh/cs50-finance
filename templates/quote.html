@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Search
+{% endblock %}
+
+{% block main %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let input = document.querySelector('input');
+            input.addEventListener('input', async function() {
+            let response = await fetch(`https://cloud.iexapis.com/stable/stock/${input.value}/quote?token={{ api_key }}`).catch((error) => {console.log(error)});
+                if (response) {
+                    if (!response.ok) {
+                        document.querySelector('p').innerHTML = "";
+                    }
+
+                    else {
+                        let symbs = await response.json();
+                        document.querySelector('p').innerHTML = `A share of ${symbs.companyName} (${symbs.symbol}) costs ${symbs.latestPrice}.`;
+                    }
+
+                }
+                else {
+                    document.querySelector('p').innerHTML = "";
+                }
+            });
+        });
+    </script>
+    <div class="mb-3">
+        <input autocomplete="off" class="form-control mx-auto w-auto" autofocus placeholder="Symbol" type="search" name="insymbs">
+    </div>
+
+    <p class="mb-3"></p>
+    <!-- <form action="/quote" method="post">
+        <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="quote" name="symbol" placeholder="Symbol" type="text" required>
+        </div>
+        <button class="btn btn-primary" type="submit">Search</button>
+    </form> -->
+{% endblock %}
